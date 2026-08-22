@@ -3,7 +3,7 @@ applied_at = "2026-08-22T00:52:34.7140652Z"
 
 [[templates]]
 source = "github.com/yukimemi/pj-base"
-rev = "27e4c1fe27ce44731a04bf0d55590fa6a0db27d4"
+rev = "8217f1a99c55240c7337f40b8afb35d9e9232499"
 version = "0.14.0"
 
 [[templates]]
@@ -42,6 +42,7 @@ content_hash = "2256d160721583ff5b6afe5c9a1778761f7ce6fc5ba46dbe27c9cd7d803a0632
 content_hash = "4bebd1c3417c33f9d1c51f011694f6d82b098bbb1a5a102ba56e97ab01a866ef"
 
 [files.".kata/vars.toml"]
+content_hash = "393b2b94540e792790ef9357e46e5bc259eb3064605794ca2373ae458999cb23"
 once_applied = true
 
 [files.".stylua.toml"]
