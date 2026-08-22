@@ -1,0 +1,85 @@
+*autocursor.txt*  Switch cursorline / cursorcolumn on Neovim events
+
+==============================================================================
+INTRODUCTION                                                      *autocursor*
+
+autocursor.nvim lights up 'cursorline' / 'cursorcolumn' when you stop moving
+and drops them again the moment you start, driven by ordinary autocmd events.
+Pure Lua, Neovim only. Requires Neovim >= 0.10.
+
+==============================================================================
+SETUP                                                       *autocursor-setup*
+
+>lua
+    require("autocursor").setup({
+      notify = false,
+      log_level = "warn",
+      throttle = 300,
+      fix_interval = 5000,
+      ignore_filetypes = { "ctrlp", "ddu-ff", "qf", "quickfix" },
+      cursorline = {
+        enable = true,
+        events = {
+          { name = { "CursorHold", "CursorHoldI" }, set = true, wait = 100 },
+          { name = { "WinEnter", "BufEnter" }, set = true, wait = 0 },
+          { name = { "CursorMoved", "CursorMovedI" }, set = false, wait = 0 },
+        },
+      },
+      cursorcolumn = { enable = true, events = { ... } },
+    })
+<
+
+                                                    *autocursor-setup-events*
+An event entry is `{ name = <event or events>, set = <bool>, wait = <ms> }`.
+`set = true` does `set {option}`, `set = false` does `set no{option}`, and
+`wait` is added to `throttle` for that event only. A `name` list expands into
+one autocmd per event; duplicate `(name, set, wait)` triples are dropped.
+
+A user `events` list REPLACES the default one — list every event you want.
+Every other key may be given partially.
+
+                                                   *autocursor-setup-options*
+notify            Emit a |vim.notify()| on every switch, gated by
+                  `log_level`. Default `false`.
+log_level         Minimum severity surfaced when `notify = true`. One of
+                  "trace", "debug", "info", "warn", "error". Default "warn".
+throttle          Throttle window in ms. The first event after a quiet spell
+                  switches immediately; events inside the window collapse
+                  into a single switch at its end. Default 300.
+fix_interval      Interval in ms for resyncing the tracked state with the
+                  real option values, so an external `:set cursorline` (a
+                  colorscheme, another plugin, you) cannot wedge the switch.
+                  0 turns the timer off. Default 5000.
+ignore_filetypes  Filetypes never touched. Default: ctrlp, ddu-ff,
+                  ddu-ff-filter, ddu-filer, dpswalk, list, qf, quickfix.
+
+==============================================================================
+COMMANDS                                                 *autocursor-commands*
+
+                                                     *:EnableAutoCursorLine*
+:EnableAutoCursorLine     Switch 'cursorline' automatically.
+
+                                                    *:DisableAutoCursorLine*
+:DisableAutoCursorLine    Stop switching 'cursorline' and clear it now.
+
+                                                   *:EnableAutoCursorColumn*
+:EnableAutoCursorColumn   Switch 'cursorcolumn' automatically.
+
+                                                  *:DisableAutoCursorColumn*
+:DisableAutoCursorColumn  Stop switching 'cursorcolumn' and clear it now.
+
+The commands are registered eagerly, so they work without `setup()`; only the
+autocmds need it.
+
+==============================================================================
+LUA API                                                       *autocursor-api*
+
+    require("autocursor").enable("cursorline")     ~
+    require("autocursor").disable("cursorcolumn")  ~
+
+==============================================================================
+HEALTH                                                     *autocursor-health*
+
+    :checkhealth autocursor
+
+ vim:tw=78:ts=8:ft=help:norl:

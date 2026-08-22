@@ -1,0 +1,4 @@
+# Vendored test dependencies cloned by CI (mini.nvim / plenary.nvim).
+# Consumer-owned after the first apply (`when = "once"`): add whatever
+# else your plugin vendors.
+deps/
