@@ -380,4 +380,49 @@ and opts the file into kata's Tera rendering). Action versions are
 pinned in `.kata/vars.toml` and bumped by Renovate, so don't edit
 them inline in the workflow — the bump would be clobbered on the
 next apply.
+
+### Auto-merge preconditions (one-time, per repository)
+
+Merging is GitHub's native auto-merge, armed by Renovate
+(`platformAutomerge`) and by pj-base's `kata-apply` / `apm-bump`
+workflows via `gh pr merge --auto`. Three repo-side settings are
+required, and none of them can ship from a template — a freshly
+created plugin has to be onboarded by hand, exactly like the pj-rust
+and pj-denops lines:
+
+* **`KATA_APPLY_TOKEN` secret** — a PAT with write access to the repo.
+  `kata-apply.yml` / `apm-bump.yml` check out and push with it rather
+  than `GITHUB_TOKEN`, whose pushes never trigger CI. Without it the
+  job dies at checkout with `Input required and not supplied: token`.
+* **`allow_auto_merge` enabled** on the repository.
+* **Branch protection on `main`** requiring `test (ubuntu-latest /
+  nvim stable)` and `stylua`. GitHub only arms auto-merge on a pull
+  request that is currently blocked; with no required check the PR is
+  immediately mergeable and the request is rejected with
+  `Pull request is in clean status` or `Branch does not have required
+  protected branch rules`.
+
+Only the ubuntu legs are required on purpose. The macOS / Windows legs
+and both nightly legs still run and still have to be read, but a flaky
+runner or an upstream nightly regression must not wedge every
+dependency PR.
+
+```sh
+gh secret set KATA_APPLY_TOKEN --repo yukimemi/<plugin>
+gh repo edit yukimemi/<plugin> --enable-auto-merge
+gh api -X PUT repos/yukimemi/<plugin>/branches/main/protection --input - <<'JSON'
+{
+  "required_status_checks": {
+    "strict": false,
+    "contexts": ["test (ubuntu-latest / nvim stable)", "stylua"]
+  },
+  "enforce_admins": false,
+  "required_pull_request_reviews": null,
+  "restrictions": null
+}
+JSON
+```
+
+Skipping these is silent: the plugin looks fine, but `kata-apply`
+fails every night and no template update ever reaches the repo.
 <!-- kata:agents:nvim:end -->
