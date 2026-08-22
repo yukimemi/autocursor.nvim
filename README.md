@@ -25,7 +25,29 @@ dependency).
 
 ## Install
 
-With [lazy.nvim](https://github.com/folke/lazy.nvim):
+With [rvpm](https://github.com/yukimemi/rvpm) (recommended):
+
+```sh
+rvpm add yukimemi/autocursor.nvim --on-event BufReadPre,BufNewFile --on-cmd '/^(Enable|Disable)AutoCursor.*$/'
+```
+
+Or in `config.toml`:
+
+```toml
+[[plugins]]
+url = "https://github.com/yukimemi/autocursor.nvim"
+on_event = ["BufReadPre", "BufNewFile"]
+on_cmd = ["/^(Enable|Disable)AutoCursor.*$/"]
+```
+
+> rvpm doesn't auto-run `setup()` — and here that hook is **required**, not
+> optional: the commands come up either way, but nothing is switched
+> automatically until `setup()` installs the autocmds. Put
+> `require("autocursor").setup()` (options optional) in
+> `plugins/github.com/yukimemi/autocursor.nvim/after.lua`, or run
+> `rvpm edit yukimemi/autocursor.nvim --after`.
+
+Or with [lazy.nvim](https://github.com/folke/lazy.nvim):
 
 ```lua
 {
