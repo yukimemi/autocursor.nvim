@@ -28,7 +28,7 @@ dependency).
 With [rvpm](https://github.com/yukimemi/rvpm) (recommended):
 
 ```sh
-rvpm add yukimemi/autocursor.nvim --on-event BufReadPre,BufNewFile --on-cmd '/^(Enable|Disable)AutoCursor.*$/'
+rvpm add yukimemi/autocursor.nvim --on-event BufReadPre,BufNewFile --on-cmd '/^(Enable|Disable)AutoCursor.*$/' --setup '{}'
 ```
 
 Or in `config.toml`:
@@ -38,19 +38,22 @@ Or in `config.toml`:
 url = "https://github.com/yukimemi/autocursor.nvim"
 on_event = ["BufReadPre", "BufNewFile"]
 on_cmd = ["/^(Enable|Disable)AutoCursor.*$/"]
-opts = {}
+setup = {}
 ```
 
 > `setup()` is **required** here — the commands come up either way, but the
-> switching autocmds are only installed by `setup()`. Since **rvpm >= 3.45.0**
-> you can just write `opts = {}` (as above): rvpm calls
-> `require("autocursor").setup(opts)` for you, with the same `opts` convention
-> as lazy.nvim. Anything you put in `opts` is passed straight to `setup()`.
-> Reach for `after.lua` via `rvpm edit yukimemi/autocursor.nvim --after` only
-> when you need to pass a *function* (TOML can't express one), and don't call
-> `setup()` from both places — rvpm warns about the double setup. On older rvpm
-> (< 3.45.0), fall back to writing `require("autocursor").setup()` in
-> `plugins/github.com/yukimemi/autocursor.nvim/after.lua`.
+> switching autocmds are only installed by `setup()`. Since **rvpm >= 3.48.0**
+> an entry carrying a `setup` field makes rvpm call
+> `require("autocursor").setup(<opts>)` for you: `setup = {}` calls it with no
+> options, `setup = { notify = true }` passes that table through as the options.
+> The field is named `setup` as of v3.48.0 — it replaced the older `opts` field.
+> On the command line the same thing is one flag:
+> `rvpm add yukimemi/autocursor.nvim --setup '{}'`.
+> Reach for `after.lua` via `rvpm edit yukimemi/autocursor.nvim --after` when you
+> need to pass a *function* (TOML can't express one) — and if a single `setup()`
+> call needs both data and a function, keep the whole call in `after.lua` and
+> leave `setup` out of `config.toml`. Never set up from both places — rvpm warns
+> about the double setup.
 
 Or with [lazy.nvim](https://github.com/folke/lazy.nvim):
 
@@ -62,10 +65,9 @@ Or with [lazy.nvim](https://github.com/folke/lazy.nvim):
 }
 ```
 
-As with rvpm above, `opts` is passed straight to
-`require("autocursor").setup()`. `VeryLazy` rather than a buffer event: the
-switching should also be live in a window that never reads a file (a dashboard,
-a scratch split).
+`opts` is passed straight to `require("autocursor").setup()`. `VeryLazy` rather
+than a buffer event: the switching should also be live in a window that never
+reads a file (a dashboard, a scratch split).
 
 ## Configuration
 
